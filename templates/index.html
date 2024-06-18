@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat LAN</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>Chat LAN</h1>
+    <div id="nick_form">
+        <input type="text" id="nickname_input" placeholder="Enter your nickname">
+        <button onclick="setNickname()">Set Nickname</button>
+    </div>
+    <div id="chat" style="display: none;">
+        <div id="messages"></div>
+        <input id="message_input" autocomplete="off" autofocus>
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        var socket = io();
+        var nickname;
+
+        function setNickname() {
+            var input = document.getElementById('nickname_input');
+            nickname = input.value.trim();
+            if (nickname) {
+                document.getElementById('nick_form').style.display = 'none';
+                document.getElementById('chat').style.display = 'block';
+            }
+        }
+
+        socket.on('message', function(data) {
+            var messages = document.getElementById('messages');
+            var message = document.createElement('div');
+            message.textContent = data.nickname + ': ' + data.message;
+            messages.appendChild(message);
+        });
+
+        function sendMessage() {
+            var input = document.getElementById('message_input');
+            var message = input.value;
+            if (message && nickname) {
+                socket.send({ nickname: nickname, message: message });
+                input.value = '';
+            }
+        }
+    </script>
+</body>
+</html>
